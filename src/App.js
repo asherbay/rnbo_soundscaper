@@ -1,23 +1,26 @@
 import logo from './logo.svg';
 import './App.css';
+import Environment from './Environment.js'
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+        <svg id="background" width="100%" height="100%"></svg>
+      <div id="rnbo-root">
+      <div>
+        <h1 id="patcher-title">Unnamed patcher</h1>
+      </div>
+          
+      <div id="rnbo-console">
+       
+      </div>
+      
+          <div id="rnbo-parameter-sliders">
+              <h2>Parameters</h2>
+              <em id="no-param-label">No parameters</em>
+          </div>
+      </div>
+      <Environment AudioModules={[]} CtlModules={[]} TrigModules={[]}/>
     </div>
   );
 }
