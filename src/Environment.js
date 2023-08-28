@@ -1,26 +1,19 @@
 import React, {useEffect} from 'react'
 import RNBO from '@rnbo/js'
 const Environment = (props) => {
-
+    const modules = props.modules
 
     useEffect(()=>{
         setup()
     }, [])
-     const setup = async () => { 
-        const patchExportURL = "export/FmOsc.export.json";
-        console.log('setup')
-        // Create AudioContext
-        const WAContext = window.AudioContext || window.webkitAudioContext;
-        const context = new WAContext();
-    
-        // Create gain node and connect it to audio output
-        const outputNode = context.createGain();
-        outputNode.connect(context.destination);
+
+    const LoadPatcher = async (url, context) => {
+
         
         // Fetch the exported patcher
         let response, patcher;
         try {
-            response = await fetch(patchExportURL);
+            response = await fetch(url);
             
             // const text = await response.text();  // Read text
             
@@ -43,7 +36,7 @@ const Environment = (props) => {
             if (response && (response.status >= 300 || response.status < 200)) {
                 errorContext.header = `Couldn't load patcher export bundle`
                 errorContext.description = `Check app.js to see what file it's trying to load. Currently it's` +
-                ` trying to load "${patchExportURL}". If that doesn't` + 
+                ` trying to load "${url}". If that doesn't` + 
                 ` match the name of the file you exported from RNBO, modify` + 
                 ` patchExportURL in app.js.`;
             }
@@ -65,11 +58,9 @@ const Environment = (props) => {
     
         // Create the device
         let device;
-        let device2
         try {
             console.log('patcher', patcher)
             device = await RNBO.createDevice({ context, patcher });
-            device2 = await RNBO.createDevice({ context, patcher });
         } catch (err) {
             
             return;
@@ -80,16 +71,26 @@ const Environment = (props) => {
             await device.loadDataBufferDependencies(dependencies);
     
         // Connect the device to the web audio graph
-        device2.node.connect(device.node)
-        device.node.connect(outputNode);
+        // device.node.connect(outputNode);
     
         // (Optional) Extract the name and rnbo version of the patcher from the description
         document.getElementById("patcher-title").innerText = (patcher.desc.meta.filename || "Unnamed Patcher") + " (v" + patcher.desc.meta.rnboversion + ")";
     
         // (Optional) Automatically create sliders for the device parameters
         makeSliders(device);
-        makeSliders(device2);
+    }
+     const setup = () => { 
+        const patchExportURL = "export/FmOsc.export.json";
+        // Create AudioContext
+        const WAContext = window.AudioContext || window.webkitAudioContext;
+        const context = new WAContext();
     
+        // Create gain node and connect it to audio output
+        const outputNode = context.createGain();
+        outputNode.connect(context.destination);
+        
+        LoadPatcher(patchExportURL)
+        
         // (Optional) Create a form to send messages to RNBO inputs
         // makeInportForm(device);
     
